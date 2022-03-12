@@ -14,7 +14,7 @@ class Post(BaseModel):
     date: str="one"
     rating: Optional[int]=None
 
-sample_posts=[{"title":"title1","description":"description1","content":"content1","date":"date1","rating":"rating1"},{"title":"title2","description":"description2","content":"content2","date":"date2","rating":"rating2"}]
+sample_posts=[{"id": 1,"title":"title1","description":"description1","content":"content1","date":"date1","rating":"rating1"},{"id":2,"title":"title2","description":"description2","content":"content2","date":"date2","rating":"rating2"}]
 
 @app.get("/")
 def root():
@@ -41,3 +41,15 @@ def create_post(payload: Post):
     return {"data": f"returning id of new post created with unique_id: {payload_dict['id']} title: {payload_dict['title']} content: {payload_dict['content']}" }
 
 
+def find_post(id):
+    for posti in sample_posts:
+        if posti["id"]==id:
+            return posti
+
+@app.get("/post/{id}")
+def get_post(id: int):
+    print(type(id))
+    print(id)
+    posta=find_post(id)
+    print(posta)
+    return {"post_data": f"the post id is {id} , and the post is {posta} "}
