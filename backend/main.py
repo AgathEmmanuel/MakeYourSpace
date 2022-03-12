@@ -1,7 +1,13 @@
+import pydantic
 from fastapi import FastAPI
 from fastapi.params import Body
+from pydantic import BaseModel
 
 app = FastAPI()
+
+class Post(BaseModel):
+    title: str
+    content: str
 
 
 @app.get("/")
@@ -17,6 +23,6 @@ def get_posts():
 @app.get("/createpost")
 def create_post(payload: dict=Body(...)):
     print(payload)
-    return {"message": "created new pos successffully"}
+    return {"new_post": f"returning title {payload['title']} content: {payload['content']}"}
 
 
