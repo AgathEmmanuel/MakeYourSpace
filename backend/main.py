@@ -7,7 +7,9 @@ app = FastAPI()
 
 class Post(BaseModel):
     title: str
-    content: str
+    description: str
+    content: bool=False
+    date: str="one"
 
 
 @app.get("/")
@@ -21,8 +23,8 @@ def get_posts():
 
 
 @app.get("/createpost")
-def create_post(payload: dict=Body(...)):
+def create_post(payload: Post):
     print(payload)
-    return {"new_post": f"returning title {payload['title']} content: {payload['content']}"}
+    return {"data": "new post"}
 
 
