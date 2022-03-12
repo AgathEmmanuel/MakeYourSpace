@@ -1,4 +1,5 @@
 from random import randrange
+from re import S
 from typing import Optional
 import pydantic
 from fastapi import FastAPI
@@ -46,6 +47,16 @@ def find_post(id):
         if posti["id"]==id:
             return posti
 
+
+# the order of the api routes specified in this file matters 
+# as based on that the priority of the posts is decided 
+# and the first route that matches the incoming request processes it 
+@app.get("/post/test-pass-1234")
+def get_latest_post():
+    postl=sample_posts[len(sample_posts)-1]
+    return {"detail": postl}
+
+
 @app.get("/post/{id}")
 def get_post(id: int):
     print(type(id))
@@ -53,3 +64,10 @@ def get_post(id: int):
     posta=find_post(id)
     print(posta)
     return {"post_data": f"the post id is {id} , and the post is {posta} "}
+
+@app.get("/post/test-fail-1234")
+def get_latest_post():
+    postl=sample_posts[len(sample_posts)-1]
+    return {"detail": postl}
+
+
