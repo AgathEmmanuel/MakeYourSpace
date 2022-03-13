@@ -1,8 +1,6 @@
 from random import randrange
-from re import S
 from typing import Optional
-import pydantic
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
 
@@ -24,6 +22,8 @@ def root():
 
 
 
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+
 @app.get("/post")
 def get_posts():
     print("get_post initiated")
@@ -31,7 +31,7 @@ def get_posts():
 
 
 
-@app.post("/post")
+@app.post("/post",status_code=status.HTTP_201_CREATED)
 def create_post(payload: Post):
     print(payload)
     print(payload.dict())
@@ -58,16 +58,23 @@ def get_latest_post():
 
 
 @app.get("/post/{id}")
-def get_post(id: int):
+def get_post(id: int, response: Response ):
     print(type(id))
     print(id)
     posta=find_post(id)
     print(posta)
+    if not posta:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id {id} was not found")
+#        response.status_code= status.HTTP_404_NOT_FOUND
+#        return {'message': f"post with id {id} was not found"}
     return {"post_data": f"the post id is {id} , and the post is {posta} "}
 
 @app.get("/post/test-fail-1234")
 def get_latest_post():
     postl=sample_posts[len(sample_posts)-1]
     return {"detail": postl}
+
+
 
 
