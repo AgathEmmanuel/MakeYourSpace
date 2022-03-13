@@ -76,5 +76,19 @@ def get_latest_post():
     return {"detail": postl}
 
 
+def delete_post_index(id):
+    for i,p in enumerate(sample_posts):
+        if p['id']==id:
+            print(p)
+            return i
+
+@app.delete("/post/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    index=delete_post_index(id)
+    if index==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {id} does not exist")
+    sample_posts.pop(index)
+    #return {'message': f"post with id {id} was deleted"}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
