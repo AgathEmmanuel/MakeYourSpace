@@ -1,45 +1,55 @@
-from random import randrange
 from typing import Optional
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
+import psycopg2
+import time
+from psycopg2.extras import RealDictCursor
+import db_credential
+
 
 app = FastAPI()
 
 class Post(BaseModel):
+    user_id: int
     title: str
-    description: str
-    content: bool=False
-    date: str="one"
-    rating: Optional[int]=None
+    description: Optional[str]=None
+    content: Optional[str]=None
 
-sample_posts=[{"id": 1,"title":"title1","description":"description1","content":"content1","date":"date1","rating":"rating1"},{"id":2,"title":"title2","description":"description2","content":"content2","date":"date2","rating":"rating2"}]
+while True:
+    try: 
+        db_connect = psycopg2.connect(host='localhost',database=db_credential.db_database,user=db_credential.db_user,password=db_credential.db_password,cursor_factory=RealDictCursor) 
+        db_cursor = db_connect.cursor()
+        print("Connected to the database succesfully")
+        break
+    except Exception as error:
+        print("Connection to the database failed")
+        print(error)
+        time.sleep(3)
+
 
 @app.get("/")
 def root():
     print()
     return {"message": "Helloooooo Worldddddddddddd"}
 
-
-
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+sample_posts=[]
 
 @app.get("/post")
 def get_posts():
+    db_cursor.execute("""SELECT * FROM posts""")
+    posts=db_cursor.fetchall()
     print("get_post initiated")
-    return {"message": sample_posts}
+    return {"message": posts}
 
 
 
 @app.post("/post",status_code=status.HTTP_201_CREATED)
 def create_post(payload: Post):
-    print(payload)
-    print(payload.dict())
-    payload_dict= payload.dict()
-    payload_dict['id']=randrange(0,1000000)
-    sample_posts.append(payload_dict)
-    print(sample_posts)
-    return {"data": f"returning id of new post created with unique_id: {payload_dict['id']} title: {payload_dict['title']} content: {payload_dict['content']}" }
+    db_cursor.execute("""INSERT INTO posts (user_id,title,content,description) VALUES (%s,%s,%s,%s) RETURNING * """,(payload.user_id,payload.title,payload.content,payload.description))
+    post_created = db_cursor.fetchone()
+    db_connect.commit()
+    return {"message": post_created}
 
 
 def find_post(id):
@@ -48,32 +58,14 @@ def find_post(id):
             return posti
 
 
-# the order of the api routes specified in this file matters 
-# as based on that the priority of the posts is decided 
-# and the first route that matches the incoming request processes it 
-@app.get("/post/test-pass-1234")
-def get_latest_post():
-    postl=sample_posts[len(sample_posts)-1]
-    return {"detail": postl}
-
-
 @app.get("/post/{id}")
 def get_post(id: int, response: Response ):
-    print(type(id))
-    print(id)
-    posta=find_post(id)
-    print(posta)
-    if not posta:
+    db_cursor.execute("""SELECT * from posts WHERE user_id = %s """,(str(id)))
+    post_with_id = db_cursor.fetchone()
+    if not post_with_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id {id} was not found")
-#        response.status_code= status.HTTP_404_NOT_FOUND
-#        return {'message': f"post with id {id} was not found"}
-    return {"post_data": f"the post id is {id} , and the post is {posta} "}
-
-@app.get("/post/test-fail-1234")
-def get_latest_post():
-    postl=sample_posts[len(sample_posts)-1]
-    return {"detail": postl}
+    return {"post_data": post_with_id }
 
 
 def delete_post_index(id):
@@ -84,11 +76,11 @@ def delete_post_index(id):
 
 @app.delete("/post/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    index=delete_post_index(id)
-    if index==None:
+    db_cursor.execute("""DELETE FROM posts WHERE user_id = %s returning *""", (str(id)))
+    post_deleted = db_cursor.fetchone()
+    db_connect.commit()
+    if post_deleted==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {id} does not exist")
-    sample_posts.pop(index)
-    #return {'message': f"post with id {id} was deleted"}
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -100,14 +92,11 @@ def update_post_index(id):
 
 
 @app.put("/post/{id}")
-def update_post(id: int, updated_post: Post):
-    print(updated_post)
-    index=update_post_index(id)
-
-    if index==None:
+def update_post(id: int, updated_payload: Post):
+    print(updated_payload)
+    db_cursor.execute("""UPDATE posts SET title = %s, content = %s, description = %s WHERE user_id = %s RETURNING *""",(updated_payload.title,updated_payload.content,updated_payload.description,str(id)))
+    updated_post = db_cursor.fetchone()
+    db_connect.commit()
+    if update_post==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {id} does not exist")
-
-    updated_post_dict=updated_post.dict()
-    updated_post_dict['id']=id
-    sample_posts[index]=updated_post_dict
-    return {'message': f"post with id {id} was updated as {updated_post_dict}"}
+    return {'message': updated_post}

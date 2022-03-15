@@ -1,5 +1,10 @@
 # Backend
 
+
+
+
+
+
 ## steps  
 
 ```
@@ -17,6 +22,8 @@ cd backend
 uvicorn main:app             #if the file name is main.py
 
 uvicorn main:app --reload    #if the file name is main.py
+
+vicorn app.main:app --reload 	# if file is in app directory  
 
 ```
 
@@ -85,7 +92,6 @@ CREATE DATABASE test1 OWNER test1owner TABLESPACE test1space;
 
 
 
-
 ```
 
 https://www.postgresql.org/docs/9.0/sql-createdatabase.html  
@@ -95,6 +101,7 @@ https://www.postgresql.org/docs/9.5/datatype.html
 
 ### Dtabase Table schema definitions  
 
+> sample examples
 
 ```
 
@@ -127,7 +134,17 @@ CREATE TABLE account_roles (
 );
 
 
+TIMESTAMP WITH TIME ZONE
 
+
+
+```
+
+> MakeYourSpace tables
+
+```
+
+CREATE DATABASE makeyourspace;
 
 
 CREATE TABLE accounts (
@@ -139,13 +156,11 @@ CREATE TABLE accounts (
 );
 
 
-TIMESTAMP WITH TIME ZONE
-
-SELECT * FROM accounts;
 
 DROP TABLE accounts;
 
 
+SELECT * FROM accounts;
 INSERT INTO accounts(user_id,username,password,email)
 VALUES (1,'username1','password1','email1')
 RETURNING *;
@@ -159,6 +174,7 @@ psql -U postgres -d <database-name> -c "select * from accounts"
 psql -U postgres -d <database-name> -c "INSERT INTO accounts(user_id,username,password,email) VALUES (1,'username1','password1','email1') RETURNING *;"
 
 
+to populate the database with random data use INSERT+SELECT
 
 for i in {1..9};do docker exec -it <image-id>  psql -d <database-name> -U postgres -c "select * from accounts";done;
 
@@ -191,14 +207,28 @@ select * from accounts order by visitors ASC;
 select * from accounts order by visitors DESC;
 select * from accounts order by visitors DESC,user_id;
 select * from accounts order by visitors DESC,user_id DESC;
-select * from accounts order by visitors DESC,user_id DESC;
+select * from accounts order by visitors WHERE user_id=1 or user_id=2 or user_id=3  
+select * from accounts LIMIT 10; 
+select * from accounts WHERE user_id>10 LIMIT 2;
+select * from accounts ORDER BY user_id LIMIT 15 OFFSET 5;
+
+UPDATE accounts SET password='1234' WHERE user_id=2;
+
+
+create table posts ( 
+	user_id serial PRIMARY KEY, 
+	title VARCHAR NOT NULL, 
+	content VARCHAR, 
+	description VARCHAR, 
+	post_status BOOLEAN NOT NULL DEFAULT TRUE, 
+	creation_time TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 
 
-
-
-
-
+INSERT INTO posts(user_id,title)
+VALUES (1,'This is a pleasant day')
+RETURNING *;
 
 ```
 
@@ -212,9 +242,41 @@ https://www.postgresqltutorial.com/postgresql-drop-table/
 https://www.postgresqltutorial.com/postgresql-insert/  
 
 
+### Postgress driver  
+
+https://www.psycopg.org/docs/  
+
+> Psycopg :  
+
+PostgreSQL database adapter for the Python programming language
+
+> features : 
+
+implementation of the Python DB API 2.0 specification  
+thread safety (several threads can share the same connection)  
+designed for heavily multi-threaded applications  
+create and destroy lots of cursors  
+make a large number of concurrent INSERTs or UPDATEs  
+client-side and server-side cursors, asynchronous communication and notifications, COPY support 
+many Python types are supported out-of-the-box and adapted to matching PostgreSQL data types 
+flexible objects adaptation system allows adpatation to be extended and customized 
+
+
+
+```
+
+------- db_credential.py-----------
+db_database = "examplename"
+db_user = "exampleusername"
+db_password = "examplepassword"
+-----------------------------------
+
+```
 
 
 
 
+# Links  
 
-
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+https://blog.logrocket.com/building-a-graphql-server-with-fastapi/  
