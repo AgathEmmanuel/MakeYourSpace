@@ -15,6 +15,7 @@ class Post(BaseModel):
     title: str
     description: Optional[str]=None
     content: Optional[str]=None
+    post_status: Optional[bool]=True
 
 while True:
     try: 
@@ -37,7 +38,7 @@ sample_posts=[]
 
 @app.get("/post")
 def get_posts():
-    db_cursor.execute("""SELECT * FROM posts""")
+    db_cursor.execute("""SELECT * FROM posts where user_id=94 """)
     posts=db_cursor.fetchall()
     print("get_post initiated")
     return {"message": posts}
@@ -60,7 +61,7 @@ def find_post(id):
 
 @app.get("/post/{id}")
 def get_post(id: int, response: Response ):
-    db_cursor.execute("""SELECT * from posts WHERE user_id = %s """,(str(id)))
+    db_cursor.execute("""SELECT * FROM posts WHERE user_id = %s """,(str(id),))
     post_with_id = db_cursor.fetchone()
     if not post_with_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -76,7 +77,7 @@ def delete_post_index(id):
 
 @app.delete("/post/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    db_cursor.execute("""DELETE FROM posts WHERE user_id = %s returning *""", (str(id)))
+    db_cursor.execute("""DELETE FROM posts WHERE user_id = %s returning *""", (str(id),))
     post_deleted = db_cursor.fetchone()
     db_connect.commit()
     if post_deleted==None:
