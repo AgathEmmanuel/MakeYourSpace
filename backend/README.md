@@ -273,6 +273,14 @@ db_password = "examplepassword"
 
 ```
 
+### ORM (Object Relational Mapper)  
+
+Sqlalchemy  
+Alembic  
+
+https://www.sqlalchemy.org/  
+https://fastapi.tiangolo.com/tutorial/sql-databases/  
+
 
 
 
