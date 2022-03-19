@@ -282,6 +282,18 @@ https://www.sqlalchemy.org/
 https://fastapi.tiangolo.com/tutorial/sql-databases/  
 
 
+Schema/Pydantic Models  
+
+defines the structure of request and response  
+request will only go through only if it has a proper structure  
+
+Sqlalchemy Models  
+
+defines the columns of the table in database  
+perform CRUD operations on database  
+
+
+
 
 
 # Links  
