@@ -89,10 +89,12 @@ def update_post(id: int, post: schemas.PostCreate,db: Session = Depends(get_db))
     db.commit()
     return post
 
-@app.get("/user")
-def create_user(db: Session = Depends(get_db)):
-    users=db.query(models.Accounts).all()
-    return users
+@app.get("/user/{username}",response_model=schemas.UserGetResponse)
+def get_user(username: str, db: Session = Depends(get_db)):
+    user=db.query(models.Accounts).filter(models.Accounts.username==username).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, info=f"user with user: {username} do not exist")
+    return user
 
 @app.post("/user",status_code=status.HTTP_201_CREATED,response_model=schemas.UserCreateResponse)
 def create_user(payload: schemas.UserCreate, db: Session = Depends(get_db)):
