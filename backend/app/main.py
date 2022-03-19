@@ -9,6 +9,10 @@ import models
 import schemas
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+
+password_context = CryptContext(schemes=["bcrypt"],deprecated="auto")
+
 
 
 
@@ -38,10 +42,6 @@ while True:
 
 
 
-@app.get("/users")
-def create_user(db: Session = Depends(get_db)):
-    post=db.query(models.Post).all()
-    return post
 
 
 # for this get request having .app() function we are getting a list as output
@@ -54,11 +54,11 @@ def get_posts(db: Session = Depends(get_db)):
 
 @app.post("/post",status_code=status.HTTP_201_CREATED,response_model=schemas.PostCreateResponse)
 def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
-    post_created=models.Post(**payload.dict())
-    db.add(post_created)
+    post_new=models.Post(**payload.dict())
+    db.add(post_new)
     db.commit()
-    db.refresh(post_created)
-    return post_created
+    db.refresh(post_new)
+    return post_new
 
 
 @app.get("/post/{id}",response_model=schemas.PostGetResponse)
@@ -88,3 +88,19 @@ def update_post(id: int, post: schemas.PostCreate,db: Session = Depends(get_db))
     updated_payload.update(post.dict(),synchronize_session=False)
     db.commit()
     return post
+
+@app.get("/user")
+def create_user(db: Session = Depends(get_db)):
+    users=db.query(models.Accounts).all()
+    return users
+
+@app.post("/user",status_code=status.HTTP_201_CREATED,response_model=schemas.UserCreateResponse)
+def create_user(payload: schemas.UserCreate, db: Session = Depends(get_db)):
+    password_hashed = password_context.hash(payload.password)
+    payload.password = password_hashed
+    user_new=models.Accounts(**payload.dict())
+    db.add(user_new)
+    db.commit()
+    db.refresh(user_new)
+    return user_new
+
