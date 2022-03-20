@@ -2,3 +2,4 @@
 /backend/__pycache__/
 /backend/app/__pycache__/
 /backend/app/db_credential.py
+backend/app/routers/__pycache__/
