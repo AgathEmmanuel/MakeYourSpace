@@ -19,15 +19,15 @@ router = APIRouter(
 )
 
 
-@router.post('/')
+@router.post('/',response_model=schemas.UserLoginResponse)
 def login_user(payload: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)): 
     user_info = db.query(models.Accounts).filter(or_(models.Accounts.email==payload.username,models.Accounts.username==payload.username)).first()
     if not user_info:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The Credentials are invalid with no user info")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"The Credentials are invalid with no user info")
     if not password_context.verify(payload.password,user_info.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The Credentials are invalid with password filure")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"The Credentials are invalid with password filure")
 
     jwt_token = oauth2.create_access_token(data={"user_id": user_info.username})
-    return {"token": jwt_token,"token_type": "bearer"}
+    return {"jwt_token": jwt_token,"token_type": "bearer"}
 
     

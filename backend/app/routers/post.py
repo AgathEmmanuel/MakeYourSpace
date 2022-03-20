@@ -3,6 +3,7 @@ import models
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from database import engine, get_db
+from routers import oauth2
 
 from typing import List
 
@@ -16,13 +17,14 @@ router = APIRouter(
 # for this get request having .router() function we are getting a list as output
 # and adding response_model=schemas.PostGetResponse results in validation error
 @router.get("/",response_model=List[schemas.PostGetResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db),current_user_id: int = Depends(oauth2.get_current_user)):
     posts=db.query(models.Post).all()
     print(type(posts))
     return posts
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.PostCreateResponse)
-def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db),current_user_id: int = Depends(oauth2.get_current_user)):
+    print(current_user_id)
     post_new=models.Post(**payload.dict())
     db.add(post_new)
     db.commit()
@@ -31,7 +33,7 @@ def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{id}",response_model=schemas.PostGetResponse)
-def get_post(id: int, db: Session = Depends(get_db)):
+def get_post(id: int, db: Session = Depends(get_db),current_user_id: int = Depends(oauth2.get_current_user)):
     post_with_id=db.query(models.Post).filter(models.Post.post_id==id).first()
     if not post_with_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -40,7 +42,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(id: int, db: Session = Depends(get_db),current_user_id: int = Depends(oauth2.get_current_user)):
     post_deleted=db.query(models.Post).filter(models.Post.post_id==id)
     if post_deleted.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {id} does not exist")
@@ -50,7 +52,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}",response_model=schemas.PostUpdateResponse)
-def update_post(id: int, post: schemas.PostCreate,db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostCreate,db: Session = Depends(get_db),current_user_id: int = Depends(oauth2.get_current_user)):
     updated_payload = db.query(models.Post).filter(models.Post.post_id == id)
     if updated_payload.first()==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id: {id} does not exist")

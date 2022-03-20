@@ -1,3 +1,4 @@
+from optparse import Option
 from pydantic import BaseModel,EmailStr
 from datetime import datetime
 from typing import Optional
@@ -72,8 +73,13 @@ class UserLogin(BaseModel):
         orm_mode = True
 
 class UserLoginResponse(BaseModel):
-    username: str
-    creation_time: datetime
+    jwt_token: str
+    token_type: str
+    class Config:
+        orm_mode = True
+
+class JwtTokenData(BaseModel):
+    user_id: Optional[str] = None
     class Config:
         orm_mode = True
 
