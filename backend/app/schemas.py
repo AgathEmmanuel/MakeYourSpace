@@ -63,3 +63,18 @@ class UserGetResponse(BaseModel):
     creation_time: datetime
     class Config:
         orm_mode = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+    class Config:
+        orm_mode = True
+
+class UserLoginResponse(BaseModel):
+    username: str
+    creation_time: datetime
+    class Config:
+        orm_mode = True
+
+

@@ -8,7 +8,7 @@ import models
 import schemas
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
-from routers import user,post
+from routers import user,post,auth
 
 
 
@@ -32,5 +32,6 @@ while True:
 
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 

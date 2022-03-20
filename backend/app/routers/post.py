@@ -7,18 +7,21 @@ from database import engine, get_db
 from typing import List
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/post",
+    tags=['Post']
+)
 
 
 # for this get request having .router() function we are getting a list as output
 # and adding response_model=schemas.PostGetResponse results in validation error
-@router.get("/post",response_model=List[schemas.PostGetResponse])
+@router.get("/",response_model=List[schemas.PostGetResponse])
 def get_posts(db: Session = Depends(get_db)):
     posts=db.query(models.Post).all()
     print(type(posts))
     return posts
 
-@router.post("/post",status_code=status.HTTP_201_CREATED,response_model=schemas.PostCreateResponse)
+@router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.PostCreateResponse)
 def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
     post_new=models.Post(**payload.dict())
     db.add(post_new)
@@ -27,7 +30,7 @@ def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
     return post_new
 
 
-@router.get("/post/{id}",response_model=schemas.PostGetResponse)
+@router.get("/{id}",response_model=schemas.PostGetResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
     post_with_id=db.query(models.Post).filter(models.Post.post_id==id).first()
     if not post_with_id:
@@ -36,7 +39,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post_with_id 
 
 
-@router.delete("/post/{id}",status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
     post_deleted=db.query(models.Post).filter(models.Post.post_id==id)
     if post_deleted.first() == None:
@@ -46,7 +49,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put("/post/{id}",response_model=schemas.PostUpdateResponse)
+@router.put("/{id}",response_model=schemas.PostUpdateResponse)
 def update_post(id: int, post: schemas.PostCreate,db: Session = Depends(get_db)):
     updated_payload = db.query(models.Post).filter(models.Post.post_id == id)
     if updated_payload.first()==None:

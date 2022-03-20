@@ -8,17 +8,20 @@ from passlib.context import CryptContext
 
 password_context = CryptContext(schemes=["bcrypt"],deprecated="auto")
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/user",
+    tags=['User']
+)
 
 
-@router.get("/user/{username}",response_model=schemas.UserGetResponse)
+@router.get("/{username}",response_model=schemas.UserGetResponse)
 def get_user(username: str, db: Session = Depends(get_db)):
     user=db.query(models.Accounts).filter(models.Accounts.username==username).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user with user: {username} do not exist")
     return user
 
-@router.post("/user",status_code=status.HTTP_201_CREATED,response_model=schemas.UserCreateResponse)
+@router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.UserCreateResponse)
 def create_user(payload: schemas.UserCreate, db: Session = Depends(get_db)):
     password_hashed = password_context.hash(payload.password)
     payload.password = password_hashed

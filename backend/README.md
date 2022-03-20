@@ -294,6 +294,72 @@ perform CRUD operations on database
 
 
 
+### JWT Authentication  
+
+- session based authentication  
+we store something on our backend server to track weather a user is logged in  
+this can be stored in memory  or  database  
+
+- jwt authentication  
+stateless, here there is nothing in the backend for tracking user if he is logged in or out  
+the token is stored in the frontend  client to keep track  
+
+1. client sents username + password to api  
+2. if credentials are valid server signs JWT token  
+3. server sents response back with token  
+4. client can now start using resources that require authentication  
+5. client will sent the token along with the requests to the server  
+6. server at the api end point  will verify the that the token is valid  
+7. if the token is valid server will send back the requested data  
+
+jwt token is not encrypted  
+token is made up of 3 individual pieces  
+
+HEADER:  
+includes metadata about the token  
+alg = algorithm that is used for signing  
+typ = JWT  
+
+PAYLOAD:  
+is not encrypted  
+so its not good to pass any confidential information in it  
+common things that can be put in the payload  
+id of user  
+role of user  
+etc  
+including a lot of info in the token can increase the size of packet  
+and result in lose of some bandwidth  
+
+SIGNATURE:  
+combination of 3 things-  
+HEADER + PAYLOAD + Secret  
+Secret is a special password that we keep in the api  
+we pass this 3 information and pass it into the signing algorithm  
+and it will return a signature  
+
+even if a hacker try to tweek the payload with different admin privileger  
+or user ids the signature will not match with his new payload and since  
+he does not have secret cant generate updated signature  
+
+the server can verify if the token is valid by doing a simple task  
+of taking the header, payload and secret to create a new signature  
+and comparting it with the signature that came in with the request  
+
+
+> User Log in  
+1. user send login info with email and password to the endpoint  
+2. server finds user by email or username from the database  
+3. database gives back the user infor and the hashed password  
+4. server hashes the pasword from user and compares it with hashed passwork from database  
+
+
+
+https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/  
+jwt.io  
+
+
+
+
 
 
 # Links  
