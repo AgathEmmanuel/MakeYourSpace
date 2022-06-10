@@ -11,6 +11,12 @@
 
 
 
+## Steps  
+
+npx create-next-app --example with-tailwindcss makeyourspace-next  
+// creat-next-app sets up a dummy application for as using next js  
+
+
 ## Links  
 
 

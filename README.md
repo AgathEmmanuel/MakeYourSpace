@@ -12,11 +12,6 @@ A Social media application
 
 
 
-
-
-
-
-
 ## Tech Stack  
 
 * FastAPI    
