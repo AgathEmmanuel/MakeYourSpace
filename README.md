@@ -1,4 +1,4 @@
-# MakeYourSpace
+# MakeYourSpace  
 
 A Social Platform to create Relations and Attachments that we create in real world, instead of not just being a networking platform  
 
@@ -17,19 +17,28 @@ A Social media application
 
 
 
+## Tech Stack  
+
+* FastAPI    
+* Next  
+* PostgreSQL  
 
 
 
-
-
-ORM  
-SQL Alchemy  
-
-
-
-
+> Services  
 
 Frontend  
+Authentication  
+Feed  
+Post  
+UploadImage  
+StoreImage  
+Discovery  
 
-React  
+
+
+
+
+
+# Links  
 

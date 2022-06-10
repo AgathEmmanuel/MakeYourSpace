@@ -362,7 +362,33 @@ jwt.io
 
 
 
+### Redis  
+
+- stands for Remote Dictionary Server, is a fast, open source, in-memory, key-value data store.  
+- used as a database, cache, message broker, queue , for caching, session management, gaming, leaderboards, real-time analytics, geospatial, ride-hailing, chat/messaging, media streaming, and pub/sub apps. 
+- delivers sub-millisecond response times, enabling millions of requests per second for real-time applications in industries like gaming, ad-tech, financial services, healthcare, and IoT  
+- redisjson database is similar to mongodb and can be used for storing data  
+- redisstreams can be used for senting events from one microservice to another  
+ 
+
+you can post your works for a prize  
+all your posts will be visible in the general home page at frontend for all users  
+user can come and buy them via a payment service  
+
+
+the posts are stored in the postgress database service  
+once your work is bought by a user it will create an event and update your post as sold  
+we make use of asynchronous communication in backgroud to do the updation
+
+the currency service (written in go will be available) to match the price with different countries
+
+
+
 # Links  
 
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-https://blog.logrocket.com/building-a-graphql-server-with-fastapi/  
+[https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)  
+[https://developer.mozilla.org/en-US/docs/Web/HTTP/Status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)  
+[https://blog.logrocket.com/building-a-graphql-server-with-fastapi/](https://blog.logrocket.com/building-a-graphql-server-with-fastapi/)    
+[https://redis.com/blog/5-industry-use-cases-for-redis-developers/](https://redis.com/blog/5-industry-use-cases-for-redis-developers/)  
+[https://www.redis.io/docs/manual/data-types/streams/](https://www.redis.io/docs/manual/data-types/streams/)  
+[https://goswagger.io/](https://goswagger.io/)  
